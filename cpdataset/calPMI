@@ -1,0 +1,11 @@
+import scala.io.Source
+
+
+val pmiArray = Source.fromFile("/home/duc/Desktop/Thesis/cpdataset/PMI").getLines.toArray;
+for(x<- pmiArray)
+{
+	val lines = x.split(",");
+	val pmiNo = scala.math.log( lines(4).toDouble*5*scala.math.pow(10,7)/(lines(2).toDouble*lines(3).toDouble) );
+	println(pmiNo);
+}
+
