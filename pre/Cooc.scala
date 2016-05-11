@@ -3,6 +3,11 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.graphx._
 import org.apache.spark._
 import scala.util.control.Breaks._
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
+import org.apache.spark.graphx.util.GraphGenerators
+import scala.util.MurmurHash
+
 
 val textFile = sc.textFile("/user/duc/sample.tok.txt")
 val lines = textFile.map(line =>line.replaceAll("[,]+|[.]+|[(]+|[)]+", "").split("[ ]+"))
@@ -39,3 +44,7 @@ val vertices = counts.collectAsMap()
 val edges = coReduce.map(x => (x._1.first, x._1.second, x._2))
 
 val CoocWord = edges.map(x => (x._1, x._2, vertices(x._1), vertices(x._2), x._3))
+//Create Graph
+val vRDD:RDD[(VertexId, (String, Int))] = counts.map(v => (MurmurHash.stringHash(v._1), (v._1, v._2)))
+val eRDD:RDD[Edge[Int]] = edges.map( e => Edge(MurmurHash.stringHash(e._1), MurmurHash.stringHash(e._2), e._3))
+val graph = Graph(vRDD, eRDD)
